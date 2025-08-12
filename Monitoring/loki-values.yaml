@@ -1,0 +1,29 @@
+loki:
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 1000Mi
+    limits:
+      cpu: 800m
+      memory: 3000Mi
+  config:
+    limits_config:
+      retention_period: 120h
+    compactor:
+      compaction_interval: 5m
+      shared_store: filesystem
+      retention_enabled: true
+      retention_delete_delay: 5m
+      retention_delete_worker_count: 15
+
+promtail:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
