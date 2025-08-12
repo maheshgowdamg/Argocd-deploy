@@ -1,0 +1,25 @@
+controller:
+  config:
+    http-snippet: "proxy_cache_path /tmp/cache levels=1:2 keys_zone=mattermost_cache:10m max_size=3g inactive=120m use_temp_path=off;"
+    use-forwarded-headers: "true"
+  service:
+    nodePorts:
+      tcp:
+        # "8888": "30010"
+        # "9092": "30015"
+        # "8080": "30080"
+        # "27017": "30030"
+        # "5432": "30040"
+
+tcp:
+  "8888": "dev/kafka-ui:80"
+  "9092": "dev/kafka:9092"
+  "8080": "dev/keycloak:8080"
+  "27017": "dev/mongo-mongodb:27017"
+  "5432": "dev/postgresql:5432"
+  "6868": "monitoring/prometheus-grafana:80"
+  "3100": "monitoring/loki:3100"
+  # "6363": "dev/ui-core"
+  "6364": "dev/redis-master:6379"
+  "30080": "argocd/argocd-server:443"
+
