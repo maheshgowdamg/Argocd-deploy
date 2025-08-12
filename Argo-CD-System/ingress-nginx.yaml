@@ -18,7 +18,7 @@ spec:
           - $values/Ingress-Nginx/ingress-values.yaml  # Path in Git repo
 
     # 2️⃣ Values file source from Git repo
-    - repoURL: 'https://github.com/maheshgowdamg/Ingress-nginx.git'
+    - repoURL: 'https://github.com/maheshgowdamg/Argocd-deploy.git'
       targetRevision: HEAD
       ref: values
 
