@@ -16,7 +16,7 @@ spec:
 
     # 2️⃣ Git repo source containing your loki-values.yaml
     - repoURL: 'https://github.com/maheshgowdamg/Argocd-deploy.git'
-      targetRevision: main
+      targetRevision: HEAD
       ref: values
 
   destination:
