@@ -5,7 +5,6 @@ values:
       userKey: admin-user
       passwordKey: admin-password
     datasources:
-      enabled: false
       datasources.yaml:
         apiVersion: 1
         datasources:
@@ -13,7 +12,7 @@ values:
             type: prometheus
             url: http://prometheus-kube-prometheus-prometheus:9090
             access: proxy
-            isDefault: true
+            isDefault: false
     persistence:
       enabled: true
       size: 1Gi
