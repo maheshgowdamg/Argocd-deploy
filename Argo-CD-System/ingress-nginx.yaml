@@ -15,7 +15,7 @@ spec:
       targetRevision: 4.12.0
       helm:
         valueFiles:
-          - $values/Ingress-Nginx/values.yaml  # Path in Git repo
+          - $values/Ingress-Nginx/ingress-values.yaml  # Path in Git repo
 
     # 2️⃣ Values file source from Git repo
     - repoURL: 'https://github.com/maheshgowdamg/Ingress-nginx.git'
