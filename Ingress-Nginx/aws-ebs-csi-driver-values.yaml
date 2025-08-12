@@ -1,0 +1,7 @@
+enableVolumeResizing: true
+enableVolumeSnapshot: true
+serviceAccount:
+  controller:
+    create: true
+    name: ebs-csi-controller-sa
+

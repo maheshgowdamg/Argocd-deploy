@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: aws-ebs-csi-driver
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: kube-system
+    server: https://kubernetes.default.svc
+  sources:
+    # 1️⃣ Chart source (AWS EBS CSI Driver)
+    - chart: aws-ebs-csi-driver
+      repoURL: https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+      targetRevision: 2.39.3
+      helm:
+        valueFiles:
+          - $values/Ingress-Nginx/aws-ebs-csi-driver-values.yaml
+
+    # 2️⃣ Values file source from Git repo
+    - repoURL: 'https://github.com/maheshgowdamg/Argocd-deploy.git'
+      targetRevision: HEAD
+      ref: values
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  
