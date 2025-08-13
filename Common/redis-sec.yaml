@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis
+  namespace: dev
+type: Opaque
+stringData:
+  redis-password: "w+rxYe4y0y7NFd4A"

@@ -1,0 +1,25 @@
+global:
+  imageRegistry: public.ecr.aws
+
+architecture: standalone
+
+useStatefulSet: true
+
+auth:
+  existingSecret: redis
+
+metrics:
+  enabled: true
+  resources:
+    requests:
+      memory: 100Mi
+    limits:
+      memory: 200Mi
+
+resourcesPreset: xlarge
+
+persistence:
+  enabled: true
+  storageClass: gp3
+  size: 4Gi
+
