@@ -1,129 +1,128 @@
-values:
-  grafana:
-    admin:
-      existingSecret: grafana-admin
-      userKey: admin-user
-      passwordKey: admin-password
-    datasources:
-      datasources.yaml:
-        apiVersion: 1
-        datasources:
-          - name: Prometheus
-            type: prometheus
-            url: http://prometheus-kube-prometheus-prometheus:9090
-            access: proxy
-            isDefault: false
-    persistence:
-      enabled: true
-      size: 1Gi
-      accessModes:
-        - ReadWriteOnce
-    ingress:
-      enabled: true
-      ingressClassName: nginx
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-prod
-        nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      hosts:
-        - v2devk8s-m.lifetrenz.com
-      tls:
-        - hosts:
-            - v2devk8s-m.lifetrenz.com
-          secretName: v2devk8s-m-tls
+grafana:
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://prometheus-kube-prometheus-prometheus:9090
+          access: proxy
+          isDefault: false
+  persistence:
+    enabled: true
+    size: 1Gi
+    accessModes:
+      - ReadWriteOnce
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - v2devk8s-m.lifetrenz.com
+    tls:
+      - hosts:
+          - v2devk8s-m.lifetrenz.com
+        secretName: v2devk8s-m-tls
 
-  alertmanager:
-    alertmanagerSpec:
-      logFormat: json
-      logLevel: warn
-    config:
-      receivers:
-        - name: "null"
-      route:
-        receiver: "robusta"
-        routes:
-          - receiver: "null"
-            match:
-              alertname: KubeHpaMaxedOut
-          - receiver: "null"
-            match:
-              alertname: KubeMemoryOvercommit
-          - receiver: "null"
-            match:
-              alertname: KubeCPUOvercommit
+alertmanager:
+  alertmanagerSpec:
+    logFormat: json
+    logLevel: warn
+  config:
+    receivers:
+      - name: "null"
+    route:
+      receiver: "robusta"
+      routes:
+        - receiver: "null"
+          match:
+            alertname: KubeHpaMaxedOut
+        - receiver: "null"
+          match:
+            alertname: KubeMemoryOvercommit
+        - receiver: "null"
+          match:
+            alertname: KubeCPUOvercommit
 
-  defaultRules:
-    rules:
-      kubeControllerManager: false
-      kubeProxy: false
-      kubeSchedulerAlerting: false
+defaultRules:
+  rules:
+    kubeControllerManager: false
+    kubeProxy: false
+    kubeSchedulerAlerting: false
 
-  additionalPrometheusRulesMap:
-    rule-name:
-      groups:
-        - name: PodMemoryHighUsage
-          rules:
-            - alert: PodMemoryHighUsage
-              expr: >
-                (sum by (cluster, container, pod, namespace)
-                (node_namespace_pod_container:container_memory_working_set_bytes{namespace="dev"})) /
-                (sum by (cluster, container, pod, namespace)
-                (cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{namespace="dev"})) > 0.9
-              for: 10m
-              labels:
-                severity: warning
-              annotations:
-                summary: "High Memory Usage Detected!"
-                description: >
-                  🚨 Cluster *{{ $labels.cluster }}* - Pod *{{ $labels.namespace }}/{{ $labels.pod }}*
-                  (Container: *{{ $labels.container }}*) is using more than 90% of its memory limit.
+additionalPrometheusRulesMap:
+  rule-name:
+    groups:
+      - name: PodMemoryHighUsage
+        rules:
+          - alert: PodMemoryHighUsage
+            expr: >
+              (sum by (cluster, container, pod, namespace)
+              (node_namespace_pod_container:container_memory_working_set_bytes{namespace="dev"})) /
+              (sum by (cluster, container, pod, namespace)
+              (cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{namespace="dev"})) > 0.9
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High Memory Usage Detected!"
+              description: >
+                🚨 Cluster *{{ $labels.cluster }}* - Pod *{{ $labels.namespace }}/{{ $labels.pod }}*
+                (Container: *{{ $labels.container }}*) is using more than 90% of its memory limit.
 
-  prometheus:
-    prometheusSpec:
-      logFormat: json
-      logLevel: warn
-      retention: 7d
-      retentionSize: 7GB
-      storageSpec:
-        volumeClaimTemplate:
-          spec:
-            accessModes: ["ReadWriteOnce"]
-            resources:
-              requests:
-                storage: 8Gi
-      externalLabels:
-        cluster: dwise-k8s-v2-dev
-      additionalScrapeConfigs:
-        - job_name: "postgresql-monitoring"
-          scrape_timeout: 1m0s
-          scrape_interval: 1m0s
-          metrics_path: /metrics
-          params:
-            module: [http_2xx]
-          static_configs:
-            - targets:
-                - postgresql-postgresql-ha-postgresql-metrics.dev:9187
-          relabel_configs:
-            - source_labels: [__address__]
-              target_label: __param_target
-            - source_labels: [__param_target]
-              target_label: instance
-            - target_label: __address__
-              replacement: postgresql-postgresql-ha-postgresql-metrics.dev:9187
+prometheus:
+  enabled: true
+  prometheusSpec:
+    logFormat: json
+    logLevel: warn
+    retention: 7d
+    retentionSize: 7GB
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 8Gi
+    externalLabels:
+      cluster: dwise-k8s-v2-dev
+    additionalScrapeConfigs:
+      - job_name: "postgresql-monitoring"
+        scrape_timeout: 1m0s
+        scrape_interval: 1m0s
+        metrics_path: /metrics
+        params:
+          module: [http_2xx]
+        static_configs:
+          - targets:
+              - postgresql-postgresql-ha-postgresql-metrics.dev:9187
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: __param_target
+          - source_labels: [__param_target]
+            target_label: instance
+          - target_label: __address__
+            replacement: postgresql-postgresql-ha-postgresql-metrics.dev:9187
 
-        - job_name: "mongo-monitoring"
-          scrape_timeout: 1m0s
-          scrape_interval: 1m0s
-          metrics_path: /metrics
-          params:
-            module: [http_2xx]
-          static_configs:
-            - targets:
-                - mongo-mongodb-metrics.dev:9216
-          relabel_configs:
-            - source_labels: [__address__]
-              target_label: __param_target
-            - source_labels: [__param_target]
-              target_label: instance
-            - target_label: __address__
-              replacement: mongo-mongodb-metrics.dev:9216
-
+      - job_name: "mongo-monitoring"
+        scrape_timeout: 1m0s
+        scrape_interval: 1m0s
+        metrics_path: /metrics
+        params:
+          module: [http_2xx]
+        static_configs:
+          - targets:
+              - mongo-mongodb-metrics.dev:9216
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: __param_target
+          - source_labels: [__param_target]
+            target_label: instance
+          - target_label: __address__
+            replacement: mongo-mongodb-metrics.dev:9216
