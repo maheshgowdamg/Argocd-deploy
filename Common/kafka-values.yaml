@@ -1,0 +1,22 @@
+replicaCount: 2
+global:
+  imageRegistry: "public.ecr.aws"
+controller:
+  # replicaCount: 1
+  extraEnvVarsCM: "kafka"
+resources:
+  requests:
+    cpu: 750m
+    memory: 2Gi
+  limits:
+    cpu: 1250m
+    memory: 2Gi
+zookeeper:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 1.5Gi
+    limits:
+      cpu: 200m
+      memory: 1.5Gi
+
