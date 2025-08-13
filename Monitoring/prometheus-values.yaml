@@ -77,51 +77,52 @@ additionalPrometheusRulesMap:
                 (Container: *{{ $labels.container }}*) is using more than 90% of its memory limit.
 
 prometheus:
-      prometheusSpec:
-        logFormat: json
-        logLevel: warn
-        retention: 7d
-        retentionSize: 7GB
-        storageSpec:
-          volumeClaimTemplate:
-            spec:
-              accessModes: ["ReadWriteOnce"]
-              resources:
-                requests:
-                  storage: 8Gi
-        externalLabels:
-          cluster: mykare-hati-qa
-        additionalScrapeConfigs:
-          - job_name: "postgresql-monitoring"
-            scrape_timeout: 1m0s
-            scrape_interval: 1m0s
-            metrics_path: /metrics
-            params:
-              module: [http_2xx]
-            static_configs:
-              - targets:
-                  - postgresql-metrics.qa:9187
-            relabel_configs:
-              - source_labels: [__address__]
-                target_label: __param_target
-              - source_labels: [__param_target]
-                target_label: instance
-              - target_label: __address__
-                replacement: postgresql-metrics.qa:9187
-          - job_name: "mongo-monitoring"
-            scrape_timeout: 1m0s
-            scrape_interval: 1m0s
-            metrics_path: /metrics
-            params:
-              module: [http_2xx]
-            static_configs:
-              - targets:
-                  - mongo-mongodb-metrics.qa:9216
-            relabel_configs:
-              - source_labels: [__address__]
-                target_label: __param_target
-              - source_labels: [__param_target]
-                target_label: instance
-              - target_label: __address__
-                replacement: mongo-mongodb-metrics.qa:9216
+  enabled: true
+  prometheusSpec:
+    logFormat: json
+    logLevel: warn
+    retention: 7d
+    retentionSize: 7GB
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 8Gi
+    externalLabels:
+      cluster: medvista-k8s-v2-qa-sit
+    additionalScrapeConfigs:
+      - job_name: "postgresql-monitoring"
+        scrape_timeout: 1m0s
+        scrape_interval: 1m0s
+        metrics_path: /metrics
+        params:
+          module: [http_2xx]
+        static_configs:
+          - targets:
+              - postgresql-postgresql-ha-postgresql-metrics.qa:9187
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: __param_target
+          - source_labels: [__param_target]
+            target_label: instance
+          - target_label: __address__
+            replacement: postgresql-postgresql-ha-postgresql-metrics.qa:9187
 
+      - job_name: "mongo-monitoring"
+        scrape_timeout: 1m0s
+        scrape_interval: 1m0s
+        metrics_path: /metrics
+        params:
+          module: [http_2xx]
+        static_configs:
+          - targets:
+              - mongo-mongodb-metrics.dev:9216
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: __param_target
+          - source_labels: [__param_target]
+            target_label: instance
+          - target_label: __address__
+            replacement: mongo-mongodb-metrics.qa:9216
