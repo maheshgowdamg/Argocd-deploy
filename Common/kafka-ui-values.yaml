@@ -1,0 +1,14 @@
+existingSecret: "kafka-ui"
+resources:
+  requests:
+    cpu: 10m
+    memory: 500Mi
+  limits:
+    cpu: 400m
+    memory: 500Mi
+yamlApplicationConfig:
+  kafka:
+    clusters:
+      - name: dwise-k8s-v2-dev
+        bootstrapServers: kafka:9092
+
