@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kafka-ui
+  namespace: dev
+stringData:
+  AUTH_TYPE: "LOGIN_FORM"
+  SPRING_SECURITY_USER_NAME: "kafka"
+  SPRING_SECURITY_USER_PASSWORD: "7teq/IB/c0oDHJNh"
+
