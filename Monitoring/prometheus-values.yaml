@@ -1,26 +1,19 @@
 grafana:
-  admin:
-    # Make sure this secret exists in the "monitoring" namespace
-    existingSecret: grafana-admin
-    userKey: admin-user
-    passwordKey: admin-password
-
-  datasources:
-    datasources.yaml:
-      apiVersion: 1
-      datasources:
-        - name: Prometheus
-          type: prometheus
-          url: http://prometheus-prometheus-grafana-kube-pr-prometheus:9090
-          access: proxy
-          isDefault: true
+  adminPassword: "admin@123"
 
   persistence:
     enabled: true
     storageClassName: local-path
     accessModes:
       - ReadWriteOnce
-    size: 2Gi
+    size: 5Gi
+
+  additionalDataSources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://prometheus-prometheus-grafana-kube-pr-prometheus:9090
+      isDefault: true
 
 prometheus:
   prometheusSpec:
