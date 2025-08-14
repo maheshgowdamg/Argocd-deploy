@@ -1,5 +1,6 @@
 grafana:
   admin:
+    # Make sure this secret exists in the "monitoring" namespace
     existingSecret: grafana-admin
     userKey: admin-user
     passwordKey: admin-password
@@ -10,9 +11,16 @@ grafana:
       datasources:
         - name: Prometheus
           type: prometheus
-          url: http://prometheus-kube-prometheus-prometheus:9090
+          url: http://prometheus-prometheus-grafana-kube-pr-prometheus:9090
           access: proxy
           isDefault: true
+
+  persistence:
+    enabled: true
+    storageClassName: local-path
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi
 
 prometheus:
   prometheusSpec:
