@@ -8,12 +8,15 @@ grafana:
     enabled: true
     size: 5Gi
 
-  additionalDataSources:
-    - name: Prometheus
-      type: prometheus
-      access: proxy
-      url: http://prometheus-grafana-kube-pr-prometheus:9090
-      isDefault: true
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://prometheus-grafana-kube-pr-prometheus:9090
+          isDefault: true
 
 prometheus:
   prometheusSpec:
@@ -23,4 +26,4 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 10Gi   # Prometheus storage size
+              storage: 10Gi
