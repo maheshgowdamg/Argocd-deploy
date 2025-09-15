@@ -26,4 +26,18 @@ promtail:
     requests:
       cpu: 100m
       memory: 128Mi
-
+  extraScrapeConfigs: |
+    - job_name: kubernetes-pods
+      kubernetes_sd_configs:
+        - role: pod
+      relabel_configs:
+        # Scrape all namespaces
+        - source_labels: [__meta_kubernetes_namespace]
+          action: keep
+          regex: .*
+        # Label the pod name
+        - source_labels: [__meta_kubernetes_pod_name]
+          target_label: pod
+        # Label the container name
+        - source_labels: [__meta_kubernetes_container_name]
+          target_label: container
