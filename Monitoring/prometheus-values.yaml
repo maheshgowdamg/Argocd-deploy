@@ -29,12 +29,22 @@ prometheus:
             requests:
               storage: 8Gi
 
-    # ✅ Add PostgreSQL scrape job
+    # ✅ PostgreSQL scrape job with full features
     additionalScrapeConfigs:
-      - job_name: "postgresql"
-        scrape_interval: 30s
+      - job_name: "postgresql-monitoring"
+        metrics_path: /metrics         # Explicit (default is /metrics, but clearer to keep)
+        scrape_interval: 30s           # Frequency of scraping
+        scrape_timeout: 30s            # Timeout (≤ scrape_interval)
+
         static_configs:
           - targets:
-              - "postgresql-primary-metrics.dev.svc.cluster.local:9187"
-              - "postgresql-read-metrics.dev.svc.cluster.local:9187"
+              - postgresql-primary-metrics.dev.svc.cluster.local:9187
+              - postgresql-read-metrics.dev.svc.cluster.local:9187
 
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: __param_target
+          - source_labels: [__param_target]
+            target_label: instance
+          - target_label: __address__
+            replacement: postgresql-primary-metrics.dev.svc.cluster.local:9187
