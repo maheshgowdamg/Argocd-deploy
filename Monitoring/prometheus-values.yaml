@@ -8,22 +8,33 @@ grafana:
     enabled: true
     size: 5Gi
 
-  datasources:
-    datasources.yaml:
-      apiVersion: 1
-      datasources:
-        - name: Prometheus
-          type: prometheus
-          access: proxy
-          url: http://prometheus-grafana-kube-pr-prometheus:9090
-          isDefault: true
+  additionalDataSources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://prometheus-grafana-kube-pr-prometheus:9090
+      isDefault: true
 
 prometheus:
   prometheusSpec:
+    logFormat: json
+    logLevel: warn
+    retention: 7d
+    retentionSize: 7GB
     storageSpec:
       volumeClaimTemplate:
         spec:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 10Gi
+              storage: 8Gi
+
+    # ✅ Add PostgreSQL scrape job
+    additionalScrapeConfigs:
+      - job_name: "postgresql"
+        scrape_interval: 30s
+        static_configs:
+          - targets:
+              - "postgresql-primary-metrics.dev.svc.cluster.local:9187"
+              - "postgresql-read-metrics.dev.svc.cluster.local:9187"
+
