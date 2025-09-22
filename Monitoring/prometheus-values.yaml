@@ -56,10 +56,4 @@ prometheus:
 
         static_configs:
           - targets:
-              - mongodb-metrics.dev.svc.cluster.local:9216
-
-        relabel_configs:
-          - source_labels: [__address__]
-            target_label: instance
-          - target_label: __address__
-            replacement: mongodb-metrics.dev.svc.cluster.local:9216
+              - mongodb-0.mongodb-headless.dev.svc.cluster.local:9216
