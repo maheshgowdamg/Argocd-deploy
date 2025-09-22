@@ -29,12 +29,12 @@ prometheus:
             requests:
               storage: 8Gi
 
-    # ✅ PostgreSQL scrape job with full features
+    # ✅ Scrape jobs
     additionalScrapeConfigs:
       - job_name: "postgresql-monitoring"
-        metrics_path: /metrics         # Explicit (default is /metrics, but clearer to keep)
-        scrape_interval: 30s           # Frequency of scraping
-        scrape_timeout: 30s            # Timeout (≤ scrape_interval)
+        metrics_path: /metrics
+        scrape_interval: 30s
+        scrape_timeout: 30s
 
         static_configs:
           - targets:
@@ -49,14 +49,15 @@ prometheus:
           - target_label: __address__
             replacement: postgresql-primary-metrics.dev.svc.cluster.local:9187
 
-
-        - job_name: "mongodb-monitoring"
+      - job_name: "mongodb-monitoring"
         metrics_path: /metrics
         scrape_interval: 30s
         scrape_timeout: 30s
+
         static_configs:
           - targets:
               - mongodb-metrics.dev.svc.cluster.local:9216
+
         relabel_configs:
           - source_labels: [__address__]
             target_label: instance
