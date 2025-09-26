@@ -73,20 +73,25 @@ prometheus:
             namespaces:
               names: ["dev"]
         relabel_configs:
-          # Only scrape pods exposing HTTP port
-          - source_labels: [__meta_kubernetes_pod_container_port_name]
-            regex: 'http'
-            action: keep
+          # Remove port name filter for simplicity
+          #- source_labels: [__meta_kubernetes_pod_container_port_name]
+          #  regex: 'http'
+          #  action: keep
 
           # Metrics path
           - target_label: __metrics_path__
             replacement: /actuator/prometheus
 
-          # Pod IP + port
+          # Pod IP + port (change 9001 if your Spring Boot server.port is different)
           - source_labels: [__meta_kubernetes_pod_ip]
             target_label: __address__
-            replacement: ${1}:8080
+            replacement: ${1}:9001
 
           # Label instance with pod name
           - source_labels: [__meta_kubernetes_pod_name]
             target_label: instance
+
+          # Optional: only scrape running pods
+          - source_labels: [__meta_kubernetes_pod_phase]
+            regex: Running
+            action: keep
