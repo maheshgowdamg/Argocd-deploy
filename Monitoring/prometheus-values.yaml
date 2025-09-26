@@ -85,7 +85,7 @@ prometheus:
           # Pod IP + port (change 9001 if your Spring Boot server.port is different)
           - source_labels: [__meta_kubernetes_pod_ip]
             target_label: __address__
-            replacement: ${1}:9001
+            replacement: ${1}:8080
 
           # Label instance with pod name
           - source_labels: [__meta_kubernetes_pod_name]
