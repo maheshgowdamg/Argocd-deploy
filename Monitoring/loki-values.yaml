@@ -3,7 +3,7 @@ loki:
     enabled: true
     accessModes:
       - ReadWriteOnce
-    size: 10Gi
+    size: 1Gi
   resources:
     requests:
       cpu: 100m
