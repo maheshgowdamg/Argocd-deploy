@@ -6,7 +6,7 @@ grafana:
 
   persistence:
     enabled: true
-    size: 5Gi
+    size: 2Gi
 
   additionalDataSources:
     - name: Prometheus
@@ -20,14 +20,14 @@ prometheus:
     logFormat: json
     logLevel: warn
     retention: 7d
-    retentionSize: 7GB
+    retentionSize: 3GB
     storageSpec:
       volumeClaimTemplate:
         spec:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 8Gi
+              storage: 2Gi
 
     # --------------------------
     # Scrape jobs
