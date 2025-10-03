@@ -66,20 +66,13 @@ prometheus:
             namespaces:
               names: ["dev"]
         relabel_configs:
-          # Metrics path
           - target_label: __metrics_path__
             replacement: /actuator/prometheus
-
-          # Pod IP + port (change 8080 if your Spring Boot server.port is different)
           - source_labels: [__meta_kubernetes_pod_ip]
             target_label: __address__
             replacement: ${1}:8080
-
-          # Label instance with pod name
           - source_labels: [__meta_kubernetes_pod_name]
             target_label: instance
-
-          # Only scrape running pods
           - source_labels: [__meta_kubernetes_pod_phase]
             regex: Running
             action: keep
@@ -87,5 +80,5 @@ prometheus:
   # --------------------------
   # Disable Node Exporter
   # --------------------------
-  prometheus-node-exporter:
+  nodeExporter:
     enabled: false
