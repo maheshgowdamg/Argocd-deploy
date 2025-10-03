@@ -25,14 +25,14 @@ loki:
             store: inmemory
           replication_factor: 1
         final_sleep: 0s
-      chunk_idle_period: 3h            # ↑ Keep chunks longer
-      max_chunk_age: 3h                # ↑ Max age before chunk is sealed
-      chunk_retain_period: 1h          # ↑ Retain chunks for 1h after sealing
+      chunk_idle_period: 3h
+      max_chunk_age: 3h
+      chunk_retain_period: 1h
       wal:
         enabled: true
         dir: /data/wal
     limits_config:
-      retention_period: 72h            # 3 days retention
+      retention_period: 72h
       max_query_lookback: 72h
     chunk_store_config:
       max_look_back_period: 72h
@@ -82,6 +82,7 @@ promtail:
     positions:
       filename: /data/positions.yaml
     scrape_configs:
+      # System logs
       - job_name: system
         static_configs:
           - targets:
@@ -89,3 +90,12 @@ promtail:
             labels:
               job: varlogs
               __path__: /var/log/**/*.log
+
+      # PostgreSQL logs
+      - job_name: postgresql
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              job: postgresql
+              __path__: /bitnami/postgresql/logs/*.log
