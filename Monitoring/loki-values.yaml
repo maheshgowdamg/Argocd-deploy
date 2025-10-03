@@ -4,7 +4,7 @@ loki:
     enabled: true
     accessModes:
       - ReadWriteOnce
-    size: 3Gi  # Adjust storage size as per your log volume (10Gi is a safe starting point)
+    size: 3Gi  # Adjust as needed, but must match existing PVC
   resources:
     requests:
       cpu: 100m
@@ -30,9 +30,9 @@ loki:
       chunk_retain_period: 30s
       wal:
         enabled: true
-        dir: /var/loki/wal
+        dir: /data/wal             # ✅ FIXED
     limits_config:
-      retention_period: 72h           # Keep logs for 3 days
+      retention_period: 72h        # 3 days logs
       max_query_lookback: 72h
     chunk_store_config:
       max_look_back_period: 72h
@@ -47,11 +47,11 @@ loki:
             period: 24h
     storage_config:
       boltdb_shipper:
-        active_index_directory: /var/loki/index
-        cache_location: /var/loki/boltdb-cache
+        active_index_directory: /data/index        # ✅ FIXED
+        cache_location: /data/boltdb-cache         # ✅ FIXED
         shared_store: filesystem
       filesystem:
-        directory: /var/loki/chunks
+        directory: /data/chunks                    # ✅ FIXED
     table_manager:
       retention_deletes_enabled: true
       retention_period: 72h
@@ -68,3 +68,4 @@ promtail:
     requests:
       cpu: 100m
       memory: 128Mi
+
