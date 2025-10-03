@@ -1,9 +1,10 @@
 loki:
+  enabled: true
   persistence:
     enabled: true
     accessModes:
       - ReadWriteOnce
-    size: 1Gi
+    size: 3Gi  # Adjust storage size as per your log volume (10Gi is a safe starting point)
   resources:
     requests:
       cpu: 100m
@@ -11,9 +12,49 @@ loki:
     limits:
       cpu: 800m
       memory: 3000Mi
+  compactor:
+    enabled: true  # Required for retention to work
   config:
+    auth_enabled: false
+    server:
+      http_listen_port: 3100
+    ingester:
+      lifecycler:
+        ring:
+          kvstore:
+            store: inmemory
+          replication_factor: 1
+        final_sleep: 0s
+      chunk_idle_period: 1h
+      max_chunk_age: 1h
+      chunk_retain_period: 30s
+      wal:
+        enabled: true
+        dir: /var/loki/wal
     limits_config:
-      retention_period: 120h
+      retention_period: 72h           # Keep logs for 3 days
+      max_query_lookback: 72h
+    chunk_store_config:
+      max_look_back_period: 72h
+    schema_config:
+      configs:
+        - from: 2020-10-24
+          store: boltdb-shipper
+          object_store: filesystem
+          schema: v11
+          index:
+            prefix: index_
+            period: 24h
+    storage_config:
+      boltdb_shipper:
+        active_index_directory: /var/loki/index
+        cache_location: /var/loki/boltdb-cache
+        shared_store: filesystem
+      filesystem:
+        directory: /var/loki/chunks
+    table_manager:
+      retention_deletes_enabled: true
+      retention_period: 72h
     compactor:
       compaction_interval: 5m
       shared_store: filesystem
@@ -22,8 +63,8 @@ loki:
       retention_delete_worker_count: 15
 
 promtail:
+  enabled: true
   resources:
     requests:
       cpu: 100m
       memory: 128Mi
- 
