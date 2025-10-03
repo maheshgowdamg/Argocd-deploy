@@ -4,7 +4,7 @@ loki:
     enabled: true
     accessModes:
       - ReadWriteOnce
-    size: 3Gi  # Adjust as needed, but must match existing PVC
+    size: 3Gi  # Must match existing PVC
   resources:
     requests:
       cpu: 100m
@@ -30,7 +30,7 @@ loki:
       chunk_retain_period: 30s
       wal:
         enabled: true
-        dir: /data/wal             # ✅ FIXED
+        dir: /data/wal             # ✅ Fixed to PVC mount
     limits_config:
       retention_period: 72h        # 3 days logs
       max_query_lookback: 72h
@@ -47,11 +47,11 @@ loki:
             period: 24h
     storage_config:
       boltdb_shipper:
-        active_index_directory: /data/index        # ✅ FIXED
-        cache_location: /data/boltdb-cache         # ✅ FIXED
+        active_index_directory: /data/index        # ✅ Fixed
+        cache_location: /data/boltdb-cache         # ✅ Fixed
         shared_store: filesystem
       filesystem:
-        directory: /data/chunks                    # ✅ FIXED
+        directory: /data/chunks                    # ✅ Fixed
     table_manager:
       retention_deletes_enabled: true
       retention_period: 72h
@@ -68,4 +68,11 @@ promtail:
     requests:
       cpu: 100m
       memory: 128Mi
-
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: 3101
+    initialDelaySeconds: 30   # Wait 30s before first probe
+    periodSeconds: 10
+    timeoutSeconds: 5         # Give Promtail enough time to start
+    failureThreshold: 10      # Only mark not ready after 10 failures
