@@ -91,11 +91,4 @@ promtail:
               job: varlogs
               __path__: /var/log/**/*.log
 
-      # PostgreSQL logs
-      - job_name: postgresql
-        static_configs:
-          - targets:
-              - localhost
-            labels:
-              job: postgresql
-              __path__: /bitnami/postgresql/logs/*.log
+      
