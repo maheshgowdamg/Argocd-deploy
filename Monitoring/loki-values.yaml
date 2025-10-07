@@ -25,14 +25,14 @@ loki:
             store: inmemory
           replication_factor: 1
         final_sleep: 0s
-      chunk_idle_period: 3h
-      max_chunk_age: 3h
-      chunk_retain_period: 1h
+      chunk_idle_period: 3h            # ↑ Keep chunks longer
+      max_chunk_age: 3h                # ↑ Max age before chunk is sealed
+      chunk_retain_period: 1h          # ↑ Retain chunks for 1h after sealing
       wal:
         enabled: true
         dir: /data/wal
     limits_config:
-      retention_period: 72h
+      retention_period: 72h            # 3 days retention
       max_query_lookback: 72h
     chunk_store_config:
       max_look_back_period: 72h
@@ -82,7 +82,7 @@ promtail:
     positions:
       filename: /data/positions.yaml
     scrape_configs:
-      # System logs
+      # This job scrapes system logs from the Kubernetes nodes.
       - job_name: system
         static_configs:
           - targets:
@@ -90,5 +90,29 @@ promtail:
             labels:
               job: varlogs
               __path__: /var/log/**/*.log
-
       
+      # --- ADDED THIS SECTION FOR POSTGRESQL ---
+      # This job discovers and scrapes logs from your PostgreSQL pods in the 'dev' namespace.
+      - job_name: dev/postgresql
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: ["dev"] # Scans only the 'dev' namespace
+        relabel_configs:
+          # Keep pods that have the label 'app.kubernetes.io/name: postgresql'
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+            regex: postgresql
+            action: keep
+
+          # From those pods, only read logs from the container named 'postgresql'
+          - source_labels: [__meta_kubernetes_pod_container_name]
+            regex: postgresql
+            action: keep
+
+          # Create useful labels in Loki from the pod's metadata
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_component]
+            target_label: component # This will be 'primary' or 'read'
